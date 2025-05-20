@@ -37,7 +37,7 @@ class ProductManager {
             const index = products.findIndex((p) => p.id === id);
             if (index !== -1) {
                 products[index] = { ...products[index], ...productoActualizado };
-                products[index].id = id; // Asegurarse de que el ID no cambie
+                products[index].id = id;
                 await fs.writeFile(this.path, JSON.stringify(products, null, 2));
                 return products[index];
             } else {

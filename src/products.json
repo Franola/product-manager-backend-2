@@ -1,44 +1,57 @@
 [
   {
-    "id": 1,
-    "title": "Producto 1",
-    "description": "Descripción del producto 1",
+    "title": "Manteca",
+    "description": "Manteca 100g",
     "code": "P001",
-    "price": 143,
+    "price": "2200",
     "status": true,
-    "stock": 60,
-    "category": "Categoría 1",
-    "thumbnails": [
-      "ruta/a/imagen1.jpg",
-      "ruta/a/imagen2.jpg"
-    ]
+    "stock": "150",
+    "category": "Lacteos",
+    "thumbnails": [],
+    "id": 1
   },
   {
-    "title": "Producto 3",
-    "description": "Descripción del producto 3",
-    "code": "P003",
-    "price": 300,
+    "title": "Leche Entera",
+    "description": "Leche entera 1L",
+    "code": "P002",
+    "price": "3000",
     "status": true,
-    "stock": 30,
-    "category": "Categoría 3",
-    "thumbnails": [
-      "ruta/a/imagen5.jpg",
-      "ruta/a/imagen6.jpg"
-    ],
+    "stock": "50",
+    "category": "Lacteos",
+    "thumbnails": [],
+    "id": 2
+  },
+  {
+    "title": "Pan Lactal",
+    "description": "Pan lactal blanco 500g",
+    "code": "P003",
+    "price": "2500",
+    "status": true,
+    "stock": "200",
+    "category": "Panadería",
+    "thumbnails": [],
     "id": 3
   },
   {
-    "title": "Producto 2",
-    "description": "Descripción del producto 2",
-    "code": "P002",
-    "price": 424,
+    "title": "Fideos Spaghetti",
+    "description": "Fideos tipo spaghetti 500g",
+    "code": "P004",
+    "price": "1700",
     "status": true,
-    "stock": 20,
-    "category": "Categoría 2",
-    "thumbnails": [
-      "ruta/a/imagen3.jpg",
-      "ruta/a/imagen4.jpg"
-    ],
-    "id": 2
+    "stock": "300",
+    "category": "Almacén",
+    "thumbnails": [],
+    "id": 4
+  },
+  {
+    "title": "Salame",
+    "description": "Salame picado fino",
+    "code": "P005",
+    "price": "2000",
+    "status": true,
+    "stock": "700",
+    "category": "Fiambre",
+    "thumbnails": [],
+    "id": 5
   }
 ]

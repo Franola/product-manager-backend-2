@@ -1,0 +1,35 @@
+<h1>Real Time Products</h1>
+
+<div class="products-form">     
+    <label for="title" style="margin: 2px;">Title</label>
+    <input type="text" name="title" id="title" placeholder="Title" style="margin: 2px;" required>
+    <br>
+    <label for="description" style="margin: 2px;">Description</label>
+    <input type="text" name="description" id="description" placeholder="Description" style="margin: 2px;" required>
+    <br>
+    <label for="code" style="margin: 2px;">Code</label>
+    <input type="text" name="code" id="code" placeholder="Code" style="margin: 2px;" required>
+    <br>
+    <label for="price" style="margin: 2px;">Price</label>
+    <input type="number" name="price" id="price" placeholder="Price" style="margin: 2px;" required>
+    <br>
+    <label for="price" style="margin: 2px;">Category</label>
+    <input type="text" name="category" id="category" placeholder="Category" style="margin: 2px;" required>
+    <br>
+    <label for="stock" style="margin: 2px;">Stock</label>
+    <input type="number" name="stock" id="stock" placeholder="Stock" style="margin: 2px;" required>
+    <br>
+    <label for="status" style="margin: 2px;">Status</label>
+    <input type="checkbox" name="status" id="status" placeholder="Status" style="margin: 2px;" required>
+    <br>
+    <button type="submit" id="addProduct" style="margin: 2px;">Add Product</button>
+</div>
+
+<div class="products-list">
+    <div id="productList">
+
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/realTimeProducts.js"></script>
