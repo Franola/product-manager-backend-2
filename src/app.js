@@ -1,28 +1,43 @@
-const express = require("express");
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import productsRouter from "./routes/products.router.js";
+import cartsRouter from "./routes/carts.router.js";
+import uploader from "./utils.js";
+import handlebars from "express-handlebars";
+import path from "path";
+import viewRouter from "./routes/view.router.js";
+import { Server } from "socket.io";
+import ProductManager from "./ProductManager.js";
+import http from "http";
+
+dotenv.config();
+
 const app = express();
 const PORT = 8080;
-const uploader = require("./utils");
-const handlebars = require("express-handlebars");
-const path = require("path");
-const viewRouter = require("./routes/view.router");
-const { Server } = require("socket.io");
 
-const ProductManager = require("./ProductManager");
 const productManager = new ProductManager();
 
 app.engine("handlebars", handlebars.engine());
 app.set("view engine", "handlebars");
-app.set("views", path.join(__dirname, "views"));
-
-const productsRouter = require("./routes/products.router");
-const cartsRouter = require("./routes/carts.router");
+app.set("views", path.join(process.cwd(), "src", "views"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(process.cwd(), "src", "public")));
 
-const http = require("http").createServer(app);
-const io = new Server(http);
+const Http = http.createServer(app);
+const io = new Server(Http);
+
+const URL_MONGO = process.env.MONGO_URI;
+
+mongoose.connect(URL_MONGO, {
+    dbName: "CoderApp",
+}).then(() => {
+    console.log("Conectado a la base de datos MongoDB");
+}).catch((error) => {
+    console.error("Error al conectar a la base de datos:", error);
+});
 
 app.use("/view", viewRouter);
 
@@ -64,6 +79,6 @@ app.post("/upload", uploader.single("file"), (req, res) => {
     res.send("Archivo subido correctamente");
 });
 
-http.listen(8080, () => {
+Http.listen(8080, () => {
   console.log(`App corriendo en puerto ${PORT}`);
 });

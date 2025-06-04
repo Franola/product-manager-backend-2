@@ -1,11 +1,13 @@
-const express = require("express");
+import express from "express";
+import ProductManager from "../ProductManager.js";
 const router = express.Router();
 
-const ProductManager = require("../ProductManager");
 const productManager = new ProductManager();
 
 router.get("/", (req, res) => {
-    productManager.obtenerProductos().then((products) => {
+    const { limit = 10, page = 1, sort = "", query = "" } = req.query;
+
+    productManager.obtenerProductosPaginados(limit, page, sort, query).then((products) => {
         res.json(products);
     }).catch((error) => {
         res.status(500).json({ error: "Error al obtener los productos" });
@@ -13,9 +15,9 @@ router.get("/", (req, res) => {
 });
 
 router.get("/:pid", (req, res) => {
-    const pid = parseInt(req.params.pid);
-    productManager.obtenerProductos().then((products) => {
-        const product = products.find(p => p.id === pid);
+    const pid = req.params.pid; 
+
+    productManager.obtenerProductoPorId(pid).then((product) => {
         if (product) {
             res.json(product);
         } else {
@@ -41,7 +43,7 @@ router.post("/", (req, res) => {
 });
 
 router.put("/:pid", (req, res) => {
-    const pid = parseInt(req.params.pid);
+    const pid = req.params.pid;
     const updatedProduct = req.body;
 
     if(!updatedProduct.title || !updatedProduct.description || !updatedProduct.code || !updatedProduct.price || !updatedProduct.status || !updatedProduct.stock || !updatedProduct.category) {
@@ -60,7 +62,7 @@ router.put("/:pid", (req, res) => {
 });
 
 router.delete("/:pid", (req, res) => {
-    const pid = parseInt(req.params.pid);
+    const pid = req.params.pid;
     productManager.eliminarProducto(pid).then((productoEliminado) => {
         if (productoEliminado) {
             res.json(productoEliminado);
@@ -72,4 +74,4 @@ router.delete("/:pid", (req, res) => {
     });
 });
 
-module.exports = router;
+export default router;

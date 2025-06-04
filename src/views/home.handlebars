@@ -1,9 +1,30 @@
+<a id="linkCart" href="" hidden>Ver carrito</a>
 <h2>Productos</h2>
-    {{#each products}}
-        <h3>{{this.code}} - {{this.title}}</h3>
-        <ul>
-            <li>{{this.description}}</li>
-            <li>Precio: ${{this.price}}</li>
-            <li>Stock: {{this.stock}}</li>
-        </ul>
-    {{/each}}
+{{#each products}}
+  <div class="product-{{this._id}}">
+    <h3><a href="/view/product?id={{this._id}}">{{this.code}} - {{this.title}}</a></h3>
+    <ul>
+        <li>{{this.description}}</li>
+        <li>Precio: ${{this.price}}</li>
+        <li>Stock: {{this.stock}}</li>
+        <li><button id="{{this._id}}" class="button-addCart">Agregar al carrito</button></li>
+    </ul>
+  </div>
+{{/each}}
+
+<div>
+  {{#if hasPrevPage}}
+    <a href="/view/home?page={{prevPage}}">Anterior</a>
+  {{/if}}
+
+  Página
+  {{page}}
+  de
+  {{totalPages}}
+
+  {{#if hasNextPage}}
+    <a href="/view/home?page={{nextPage}}">Siguiente</a>
+  {{/if}}
+</div>
+
+<script src="/js/home.js"></script>

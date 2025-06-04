@@ -1,7 +1,10 @@
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
-const dir = path.join(__dirname, "./public/img");
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+// const multer = require("multer");
+// const fs = require("fs");
+// const path = require("path");
+const dir = "./public/img";
 
 if (!fs.existsSync(dir)) {
   
@@ -21,4 +24,4 @@ const storage = multer.diskStorage({
 
 const uploader = multer({ storage });
 
-module.exports = uploader;
+export default uploader;

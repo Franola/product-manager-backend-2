@@ -1,21 +1,18 @@
-const fs = require("fs").promises;
-const path = require("path");
-const ProductManager = require("./ProductManager");
+import { CartModel } from "./models/cart.model.js";
+import ProductManager from "./ProductManager.js";
 
 class CartManager{
     constructor() {
-        this.path = path.join(__dirname, "carts.json");
+        this.path = "";
     }
 
     async crearCarrito() {
         try {
-            const data = await fs.readFile(this.path, "utf-8");
-            const carts = JSON.parse(data);
-            const nuevoId = carts.length ? carts[carts.length - 1].id + 1 : 1;
-            const nuevoCarrito = { id: nuevoId, products: [] };
-            carts.push(nuevoCarrito);
-            await fs.writeFile(this.path, JSON.stringify(carts, null, 2));
-            return nuevoCarrito;
+            const cart = {
+                products: []
+            };
+            const newCart = await CartModel.create(cart);
+            return newCart;
         } catch (error) {
             console.error("Error al crear el carrito:", error);
         }
@@ -23,20 +20,14 @@ class CartManager{
 
     async obtenerProductosDelCarrito(cid){
         try {
-            const data = await fs.readFile(this.path, "utf-8");
-            const carts = JSON.parse(data);
-            const cart = carts.find(cart => cart.id === cid);
+            const cart = await CartModel.findById(cid).populate('products.product').lean();
             if (!cart) {
-                console.error("Carrito no encontrado");
-                return null;
+                throw new Error("Carrito no encontrado");
             }
-            const productManager = new ProductManager();
-            const products = await productManager.obtenerProductos();
-
-            const cartProducts = cart.products.map(product => {
-                const productData = products.find(p => p.id === product.id);
-                return { ...productData, quantity: product.quantity };
-            });
+            const cartProducts = cart.products.map(item => ({
+                product: item.product,
+                quantity: item.quantity
+            }));
 
             return cartProducts;
         }
@@ -48,34 +39,105 @@ class CartManager{
 
     async agregarProductoAlCarrito(cid, pid) {
         try {
-            const data = await fs.readFile(this.path, "utf-8");
-            const carts = JSON.parse(data);
-            const cart = carts.find(cart => cart.id === cid);
+            const cart = await CartModel.findById(cid);
             if (!cart) {
                 throw new Error("Carrito no encontrado");
             }
-
+            
             const productManager = new ProductManager();
-            const products = await productManager.obtenerProductos();
-            const product = products.find(p => p.id === pid);
+            const product = await productManager.obtenerProductoPorId(pid);
             if (!product) {
                 throw new Error("Producto no encontrado");
             }
-
-            const productInCart = cart.products.find(p => p.id === pid);
+            
+            const productInCart = cart.products.find(p => p.product.toString() === pid);
             if (productInCart) {
                 productInCart.quantity += 1;
             } else {
-                cart.products.push({ id: pid, quantity: 1 });
+                cart.products.push({ product: pid, quantity: 1 });
             }
-            
-            await fs.writeFile(this.path, JSON.stringify(carts, null, 2));
+            await cart.save();
             return cart;
         } catch (error) {
             console.error("Error al agregar el producto al carrito:", error);
             throw error;
         }
     }
+
+    async eliminarProductoDelCarrito(cid, pid){
+        try{
+            const cart = await CartModel.findById(cid);
+            if (!cart) {
+                throw new Error("Carrito no encontrado");
+            }
+
+            const productsfromCart = cart.products.filter(p => p.product.toString() !== pid);
+            cart.products = productsfromCart;
+
+            await cart.save();
+            return cart;
+        } catch(error){
+            console.error("Error al agregar el producto al carrito:", error);
+            throw error;
+        }
+    }
+
+    async actualizarProductosCarrito(cid, products) {
+        try {
+            const cart = await CartModel.findById(cid);
+            if (!cart) {
+                throw new Error("Carrito no encontrado");
+            }
+
+            cart.products = products.map(product => ({
+                product: product.product,
+                quantity: product.quantity
+            }));
+
+            await cart.save();
+            return cart;
+        } catch (error) {
+            console.error("Error al actualizar los productos del carrito:", error);
+            throw error;
+        }
+    }
+
+    async actualizarCantidadProductoCarrito(cid, pid, quantity) {
+        try {
+            const cart = await CartModel.findById(cid);
+            if (!cart) {
+                throw new Error("Carrito no encontrado");
+            }
+
+            const productInCart = cart.products.find(p => p.product.toString() === pid);
+            if (productInCart) {
+                productInCart.quantity = quantity;
+                await cart.save();
+                return cart;
+            } else {
+                throw new Error("Producto no encontrado en el carrito");
+            }
+        } catch (error) {
+            console.error("Error al actualizar la cantidad del producto en el carrito:", error);
+            throw error;
+        }
+    }
+
+    async vaciarCarrito(cid) {
+        try {
+            const cart = await CartModel.findById(cid);
+            if (!cart) {
+                throw new Error("Carrito no encontrado");
+            }
+
+            cart.products = [];
+            await cart.save();
+            return cart;
+        } catch (error) {
+            console.error("Error al vaciar el carrito:", error);
+            throw error;
+        }
+    }
 }
 
-module.exports = CartManager;
+export default CartManager;
