@@ -94,3 +94,23 @@ addToCart.forEach(button => {
     });
 });
 
+document.getElementById('logoutButton').addEventListener('click', async (event) => {
+    event.preventDefault();
+    try {
+        console.log('Cerrando sesión...');
+        const response = await fetch('/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const result = await response.json();
+        console.log(result.message);
+        alert(result.message);
+        window.location.href = '/view/login';
+    } catch (error) {
+        console.error('Error during logout:', error);
+        alert('Error al cerrar sesión. Por favor, inténtelo de nuevo.');
+    }
+});
+

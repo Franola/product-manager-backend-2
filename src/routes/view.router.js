@@ -2,6 +2,8 @@ import express from "express";
 import ProductManager from "../ProductManager.js";
 import CartManager from "../CartManager.js";
 import { ProductModel } from "../models/product.model.js";
+import passport from 'passport';
+
 const router = express.Router();
 
 const productManager = new ProductManager();
@@ -11,7 +13,17 @@ router.get("/", (req, res) => {
     res.render("index", {});
 });
 
-router.get("/home", async (req, res) => {
+router.get("/register", (req, res) => {
+    res.render("register");
+});
+
+router.get("/login", (req, res) => {
+    res.render("login");
+});
+
+router.get("/home", passport.authenticate("current", {session:false, failureRedirect:"/error"}), async (req, res) => {
+    console.log("Usuario logueado:", req.user);
+
     const { page = 1, limit = 5 } = req.query;
     
     const result = await ProductModel.paginate({}, { page, limit, lean: true }); 

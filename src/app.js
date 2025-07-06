@@ -10,6 +10,10 @@ import viewRouter from "./routes/view.router.js";
 import { Server } from "socket.io";
 import ProductManager from "./ProductManager.js";
 import http from "http";
+import cookieParser from "cookie-parser";
+import passport from 'passport';
+import jwt from "jsonwebtoken"
+import { iniciarPassport } from "./config/passport.config.js";
 
 dotenv.config();
 
@@ -25,6 +29,10 @@ app.set("views", path.join(process.cwd(), "src", "views"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(process.cwd(), "src", "public")));
+app.use(cookieParser());
+
+iniciarPassport()
+app.use(passport.initialize())
 
 const Http = http.createServer(app);
 const io = new Server(Http);
@@ -43,6 +51,44 @@ app.use("/view", viewRouter);
 
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
+
+app.post('/register', passport.authenticate("register", {session:false, failureRedirect:"/error"}), (req,res)=>{
+    res.json({
+        usuarioCreado:req.user
+    })
+})
+
+app.post('/login', passport.authenticate("login", {session:false, failureRedirect: "/error"}), (req,res)=>{
+    let usuario=req.user
+    delete usuario.password
+    let token=jwt.sign(usuario, "Fciarallo22", {expiresIn: '1h'})
+
+    res.cookie("cookieToken", token, {httpOnly: true})
+    return res.status(200).json({
+        usuarioLogueado:usuario
+    })
+})
+
+app.post('/logout', (req, res) => {
+    console.log("Cerrando sesión");
+    res.clearCookie("cookieToken");
+    res.setHeader('Content-Type','application/json');
+    return res.status(200).json({ message: "Sesión cerrada correctamente" });
+});
+
+app.get("/api/sessions/current", passport.authenticate("current", {session:false, failureRedirect:"/error"}), (req, res)=>{
+    console.log("Usuario actual:", req.user);
+
+    res.setHeader('Content-Type','application/json');
+    return res.status(200).json({
+        usuarioLogueado:req.user
+    });
+})
+
+app.get("/error", (req, res)=>{
+    res.setHeader('Content-Type','application/json');
+    return res.status(401).json({error:`Error de autenticación`});
+})
 
 io.on("connection", (socket) => {
     console.log("cliente conectado");
