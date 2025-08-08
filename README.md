@@ -1,4 +1,4 @@
-# Proyecto Backend 1 - Coderhouse
+# Proyecto Backend - Coderhouse
 
 Este proyecto es una API y aplicación web para la gestión de productos y carritos de compras, desarrollado con Node.js, Express, MongoDB, Mongoose, Socket.io y Handlebars.
 
