@@ -14,6 +14,8 @@ import cookieParser from "cookie-parser";
 import passport from 'passport';
 import jwt from "jsonwebtoken"
 import { iniciarPassport } from "./config/passport.config.js";
+import { UserDTO } from "./dto/UserDTO.js";
+import { auth } from "./middleware/auth.js";
 
 dotenv.config();
 
@@ -59,29 +61,28 @@ app.post('/register', passport.authenticate("register", {session:false, failureR
 })
 
 app.post('/login', passport.authenticate("login", {session:false, failureRedirect: "/error"}), (req,res)=>{
-    let usuario=req.user
-    delete usuario.password
-    let token=jwt.sign(usuario, "Fciarallo22", {expiresIn: '1h'})
+    let usuario = new UserDTO(req.user);
 
-    res.cookie("cookieToken", token, {httpOnly: true})
+    let token = jwt.sign({ ...usuario }, "Fciarallo22", {expiresIn: '1h'});
+
+    res.cookie("cookieToken", token, {httpOnly: true});
     return res.status(200).json({
-        usuarioLogueado:usuario
-    })
+        usuarioLogueado: usuario
+    });
 })
 
 app.post('/logout', (req, res) => {
-    console.log("Cerrando sesión");
     res.clearCookie("cookieToken");
     res.setHeader('Content-Type','application/json');
     return res.status(200).json({ message: "Sesión cerrada correctamente" });
 });
 
-app.get("/api/sessions/current", passport.authenticate("current", {session:false, failureRedirect:"/error"}), (req, res)=>{
-    console.log("Usuario actual:", req.user);
+app.get("/api/sessions/current", passport.authenticate("current", {session:false, failureRedirect:"/error"}), auth(["user", "admin"]), (req, res)=>{
+    let usuario= new UserDTO(req.user)
 
     res.setHeader('Content-Type','application/json');
     return res.status(200).json({
-        usuarioLogueado:req.user
+        usuarioLogueado:usuario
     });
 })
 

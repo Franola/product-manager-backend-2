@@ -3,9 +3,7 @@ import local from "passport-local"
 import passportJWT from "passport-jwt"
 import fs from "fs"
 import bcrypt from "bcrypt"
-import UserManager from "../UserManager.js"
-
-const userManager = new UserManager();
+import { userService } from "../repository/UserRepository.js"
 
 const buscarToken = req => {
     let token = null
@@ -25,7 +23,7 @@ export const iniciarPassport = () => {
             },
             async (contenidoToken, done) => {
                 try {
-                    console.log("Contenido del token:", contenidoToken);
+                    
                     return done(null, contenidoToken)
                 } catch (error) {
                     return done(error)
@@ -41,8 +39,8 @@ export const iniciarPassport = () => {
             },
             async (username, password, done) => {
                 try {
-                    let usuario = await userManager.obtenerUsuarioPorEmail(username)
-                    if (!usuario) { 
+                    let usuario = await userService.getUserByEmail(username)
+                    if (!usuario) {
                         return done(null, false)
                     }
 
@@ -67,15 +65,12 @@ export const iniciarPassport = () => {
             },
             async (req, username, password, done) => {
                 try {
-                    console.log("Datos de registro:", req.body);
                     let { first_name, last_name, age, role } = req.body
                     if (!first_name || !last_name || !age) return done(null, false)
-                    
-                    console.log("Username:", username);
-                    let usuario = await userManager.obtenerUsuarioPorEmail(username)
-                    console.log("Usuario encontrado:", usuario);
+
+                    let usuario = await userService.getUserByEmail(username)
+
                     if (usuario) {
-                        console.log("Usuario ya existe:", usuario);
                         return done(null, false)
                     }
                     usuario = {
@@ -87,7 +82,7 @@ export const iniciarPassport = () => {
                         rol: role || "user"
                     }
 
-                    const newUser = await userManager.agregarUsuario(usuario)
+                    const newUser = await userService.createUser(usuario)
 
                     return done(null, newUser)
                 } catch (error) {
